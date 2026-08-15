@@ -11,6 +11,32 @@ Given an attached image, the Skill:
 5. compares the generated image with the reference; and
 6. returns the original image, palette, report, prompt, generated image, and verification manifest together.
 
+## Example: Sunlit Camera Portrait
+
+The reconstruction below was generated from the extracted text prompt only. The GPT Image generation step did not receive the reference image as an editing input.
+
+<table>
+  <tr>
+    <th width="50%">Input reference</th>
+    <th width="50%">Prompt-only GPT Image reconstruction</th>
+  </tr>
+  <tr>
+    <td width="50%"><img src="./examples/sunlit-camera-portrait/original-image.png" alt="Input reference: sunlit portrait of a woman holding a compact camera" width="100%"></td>
+    <td width="50%"><img src="./examples/sunlit-camera-portrait/generated-image.png" alt="GPT Image prompt-only reconstruction of the sunlit camera portrait" width="100%"></td>
+  </tr>
+</table>
+
+The reconstruction preserves the direct gaze, compact-camera pose, black bob and bangs, gingham-trimmed ivory outfit, backlit street setting, and muted cream-and-teal palette. Its clearest deviation is a cleaner exposure with less of the original's broad cyan-white veiling flare.
+
+![Measured five-color palette](./examples/sunlit-camera-portrait/color-palette.png)
+
+Explore the complete audit trail:
+
+- [Step-by-step reverse-engineering report](./examples/sunlit-camera-portrait/reverse-engineering.md)
+- [Extracted GPT Image prompt](./examples/sunlit-camera-portrait/gpt-image-prompt.txt)
+- [Objective image analysis](./examples/sunlit-camera-portrait/image-analysis.json)
+- [Verified bundle manifest](./examples/sunlit-camera-portrait/bundle-manifest.json)
+
 ## Install
 
 After this repository is published, ask Codex to install the Skill from:
@@ -60,10 +86,11 @@ No OpenAI API key is required for the default built-in generation path. The reco
 
 ```text
 skills/image-prompt-reverse/  Installable Skill source
+examples/                     Complete verified example bundle
 release/                      Downloadable Skill archive
 ```
 
-Reference images and generated examples are intentionally excluded from this public repository.
+This repository includes one demonstration bundle. Only add or redistribute reference images when you have permission to publish them.
 
 ## License
 

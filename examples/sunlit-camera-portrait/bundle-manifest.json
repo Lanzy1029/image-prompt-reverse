@@ -1,0 +1,31 @@
+{
+  "status": "pass",
+  "verified_at": "2026-08-15T18:03:16.046188+00:00",
+  "prompt_matches_report": true,
+  "files": {
+    "original-image.png": {
+      "bytes": 9106850,
+      "sha256": "6478ccaa5665e56252f97dd46e2f672bc6649a747afb86c6c85b0eb3e3895fa4"
+    },
+    "color-palette.png": {
+      "bytes": 2801,
+      "sha256": "572f3f64ebb15f684e4c63b21b25625972125dbc097e7f6fa05460dce5197ebb"
+    },
+    "image-analysis.json": {
+      "bytes": 1589,
+      "sha256": "d765fdaf260c46dc02d674f4bacfc84c245f57a8e45c456f62302ca15a4d9c67"
+    },
+    "reverse-engineering.md": {
+      "bytes": 14949,
+      "sha256": "b9aad5342fd9d55453439d1dc51954deffa92183eca1f12f6926fa6268fc4e6a"
+    },
+    "gpt-image-prompt.txt": {
+      "bytes": 4061,
+      "sha256": "3460473ecbe5b8564dbd8b10a3a85f3e093f0da60a3127a39b81ced39a8aa91c"
+    },
+    "generated-image.png": {
+      "bytes": 2219659,
+      "sha256": "4988d8f49c1c553397ef6b714c24f669358ff69d3e8776382a5a9be39d963bbc"
+    }
+  }
+}
