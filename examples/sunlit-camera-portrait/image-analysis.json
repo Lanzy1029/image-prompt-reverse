@@ -1,0 +1,81 @@
+{
+  "created_at": "2026-08-15T17:58:51.288228+00:00",
+  "original_file": "original-image.png",
+  "source_sha256": "6478ccaa5665e56252f97dd46e2f672bc6649a747afb86c6c85b0eb3e3895fa4",
+  "source_bytes": 9106850,
+  "pixel_dimensions": {
+    "width": 3072,
+    "height": 4096
+  },
+  "aspect_ratio": "3:4",
+  "orientation": "portrait",
+  "sample_dimensions": {
+    "width": 192,
+    "height": 256
+  },
+  "decoder": "ffmpeg",
+  "palette_file": "color-palette.png",
+  "palette": [
+    {
+      "hex": "#DCDBD5",
+      "rgb": [
+        220,
+        219,
+        213
+      ],
+      "ratio": 31.2,
+      "role": "dominant",
+      "name_en": "Cream"
+    },
+    {
+      "hex": "#7B9799",
+      "rgb": [
+        123,
+        151,
+        153
+      ],
+      "ratio": 21.5,
+      "role": "accent",
+      "name_en": "Gray"
+    },
+    {
+      "hex": "#527172",
+      "rgb": [
+        82,
+        113,
+        114
+      ],
+      "ratio": 16.8,
+      "role": "shadow",
+      "name_en": "Slate"
+    },
+    {
+      "hex": "#CFBDA8",
+      "rgb": [
+        207,
+        189,
+        168
+      ],
+      "ratio": 15.8,
+      "role": "highlight",
+      "name_en": "Beige"
+    },
+    {
+      "hex": "#AEBEBE",
+      "rgb": [
+        174,
+        190,
+        190
+      ],
+      "ratio": 14.7,
+      "role": "support",
+      "name_en": "Beige"
+    }
+  ],
+  "tonal_profile": {
+    "temperature": "balanced",
+    "contrast": "medium",
+    "saturation": "muted"
+  },
+  "measurement_note": "Palette ratios are deterministic estimates from a decoder-scaled pixel sample; semantic observations require visual inspection."
+}
