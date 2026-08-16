@@ -7,7 +7,7 @@ description: Analyze one or more user-provided reference images, reverse-enginee
 
 Turn a supplied image into an auditable reconstruction bundle. Complete the whole workflow without stopping after analysis or asking the user to copy a prompt manually.
 
-Version 1.2.1 uses `./prompt-output/` as the default result root. Continue to use the deterministic blurred color-distribution map as the only image reference during generation so GPT Image can follow the reference's large-scale color and luminance placement without receiving the original pixels or identifiable detail.
+Version 1.2.2 saves completed bundles under the current user's Downloads folder by default. Continue to use the deterministic blurred color-distribution map as the only image reference during generation so GPT Image can follow the reference's large-scale color and luminance placement without receiving the original pixels or identifiable detail.
 
 ## Required references
 
@@ -25,13 +25,14 @@ Read both files before analyzing an image:
 - Preserve the reference aspect ratio in the analysis and prompt.
 - Preserve large-scale spatial color placement through the blurred distribution map while suppressing semantic detail.
 - Use the built-in image-generation tool. Do not ask for an API key and do not use a browser UI or third-party service.
+- Save to the user's Downloads folder by default, even when the conversation is attached to a project workspace. Use another location only when the user explicitly requests it.
 
 ## Output contract
 
-Create a unique directory under `./prompt-output/` named with a timestamp and short source slug. Never overwrite a previous result. The completed directory must contain:
+Create a unique timestamped directory under the current user's Downloads folder. Use `~/Downloads/image-prompt-reverse/` on macOS and Linux, or the equivalent `Downloads\image-prompt-reverse` directory under the user profile on Windows. Never place the default result inside the conversation project, and never overwrite a previous result. The completed directory must contain:
 
 ```text
-prompt-output/<timestamp>-<slug>/
+<Downloads>/image-prompt-reverse/<timestamp>-<slug>/
 ├── original-image.<ext>
 ├── color-palette.png
 ├── color-distribution-map.png
@@ -54,7 +55,15 @@ Inspect the source with the image-viewing tool before writing any analysis. If t
 
 ### 2. Create the objective artifacts
 
-Create a unique result directory, then run:
+Create the result directory first:
+
+```bash
+python3 <skill-dir>/scripts/create_result_dir.py <input-image>
+```
+
+Capture the single absolute path printed by the script and use it as `<result-dir>` for every remaining step. Pass `--output-root <explicit-directory>` only when the user asks for a different destination. If the default Downloads destination requires filesystem approval, request narrow permission for that destination; do not silently fall back to the conversation project.
+
+Then run:
 
 ```bash
 python3 <skill-dir>/scripts/analyze_reference.py <input-image> <result-dir>
@@ -165,6 +174,7 @@ Do not finish with only file paths or only the generated image. All eight artifa
 - Unsupported/corrupt image: preserve no partial claim; report the decoder error.
 - Palette failure: do not replace measured colors with guessed colors.
 - Distribution-map failure: do not pass the original image as a substitute reference; retain the analysis artifacts and report the bundle incomplete.
+- Downloads permission failure: request access to the intended Downloads destination; do not save the bundle in the conversation project as a fallback.
 - Prompt extraction failure: repair the report markers and extract again before generation.
 - Generation failure: retain the completed analysis artifacts, clearly mark the bundle incomplete, and do not create a fake generated file or passing manifest.
 - Ambiguous visible detail: write `unclear` and give at most one plausible alternative.

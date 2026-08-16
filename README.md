@@ -1,6 +1,6 @@
 # Image Prompt Reverse
 
-`image-prompt-reverse` v1.2.1 is a reusable Codex Skill that turns a reference image into an auditable GPT Image reconstruction bundle.
+`image-prompt-reverse` v1.2.2 is a reusable Codex Skill that turns a reference image into an auditable GPT Image reconstruction bundle.
 
 Given an attached image, the Skill:
 
@@ -71,7 +71,9 @@ Attach an image and ask:
 Use $image-prompt-reverse to reverse-engineer this image and generate a reconstruction guided by its blurred color map.
 ```
 
-The Skill creates a new directory under `prompt-output/` containing:
+The Skill creates a new timestamped directory under the current user's Downloads folder. By default, bundles are saved under `~/Downloads/image-prompt-reverse/` on macOS and Linux, or the equivalent `Downloads\image-prompt-reverse` directory under the user profile on Windows. This keeps generated files outside the active conversation project.
+
+Each result directory contains:
 
 ```text
 original-image.<ext>
