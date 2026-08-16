@@ -6,12 +6,27 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
 from extract_prompt import extract_prompt
 
 BUNDLE_SCHEMA_VERSION = "1.2"
+HUMAN_SUBJECT_PATTERN = re.compile(
+    r"\b(adult|boy|child|face|girl|human|man|men|people|person|portrait|woman|women)\b",
+    re.IGNORECASE,
+)
+PORTRAIT_ANCHOR_GROUPS = (
+    ("face", "oval", "round", "angular"),
+    ("eye", "eyes", "eyelid", "eyelids"),
+    ("brow", "brows", "eyebrow", "eyebrows"),
+    ("nose", "bridge", "nostril", "nostrils"),
+    ("cheek", "cheeks", "cheekbone", "cheekbones", "jaw", "chin"),
+    ("lip", "lips", "mouth"),
+    ("skin", "complexion", "undertone"),
+    ("hair", "hairline"),
+)
 
 
 def sha256(path: Path) -> str:
@@ -43,6 +58,65 @@ def check_image(path: Path) -> None:
     )
     if not valid:
         raise ValueError(f"unrecognized image signature: {path.name}")
+
+
+def labeled_value(prompt: str, label: str) -> str | None:
+    prefix = f"{label}:"
+    for line in prompt.splitlines():
+        if line.startswith(prefix):
+            return line[len(prefix):].strip()
+    return None
+
+
+def check_portrait_appearance(prompt: str) -> dict[str, object]:
+    human_scope = " ".join(
+        value
+        for label in ("Primary request", "Subject")
+        if (value := labeled_value(prompt, label))
+    )
+    required = bool(HUMAN_SUBJECT_PATTERN.search(human_scope))
+    value = labeled_value(prompt, "Portrait appearance")
+    if not required:
+        return {"required": False, "status": "not_applicable"}
+    if not value:
+        raise ValueError("human-subject prompt lacks a Portrait appearance line")
+    if value.lower().startswith("not applicable"):
+        return {"required": True, "status": "not_applicable"}
+
+    words = set(re.findall(r"[a-z]+", value.lower()))
+    matched_groups = sum(bool(words.intersection(group)) for group in PORTRAIT_ANCHOR_GROUPS)
+    if matched_groups < 5:
+        raise ValueError(
+            "Portrait appearance must include at least five independent facial anchor groups; "
+            f"found {matched_groups}"
+        )
+    return {"required": True, "status": "pass", "anchor_groups": matched_groups}
+
+
+def check_generation_references(prompt: str) -> dict[str, object]:
+    map_guidance = labeled_value(prompt, "Color-map reference")
+    if not map_guidance:
+        raise ValueError("prompt lacks a Color-map reference line")
+    palette_guidance = labeled_value(prompt, "Palette reference")
+    if not palette_guidance:
+        raise ValueError("prompt lacks a Palette reference line")
+
+    palette_words = set(re.findall(r"[a-z]+", palette_guidance.lower()))
+    required_palette_terms = {"attached", "palette", "swatches", "hex", "layout"}
+    missing = sorted(required_palette_terms - palette_words)
+    if missing:
+        raise ValueError(
+            "Palette reference must identify the attached palette and forbid reproducing its graphics; "
+            f"missing terms: {', '.join(missing)}"
+        )
+    if "attached original" in prompt.lower():
+        raise ValueError("prompt must not request an attached original image")
+
+    return {
+        "status": "pass",
+        "image_references": ["color-distribution-map.png", "color-palette.png"],
+        "original_image_allowed": False,
+    }
 
 
 def main() -> int:
@@ -78,6 +152,8 @@ def main() -> int:
     saved_prompt = prompt_file.read_text(encoding="utf-8").strip()
     if marked_prompt != saved_prompt:
         raise ValueError("gpt-image-prompt.txt does not exactly match the marked report prompt")
+    portrait_check = check_portrait_appearance(saved_prompt)
+    generation_reference_check = check_generation_references(saved_prompt)
     for name in (original.name, palette.name, distribution.name, generated.name):
         if f"./{name}" not in report_text:
             raise ValueError(f"report does not link to {name}")
@@ -88,6 +164,8 @@ def main() -> int:
         "status": "pass",
         "verified_at": datetime.now(timezone.utc).isoformat(),
         "prompt_matches_report": True,
+        "portrait_appearance_check": portrait_check,
+        "generation_reference_contract": generation_reference_check,
         "files": {
             path.name: {"bytes": path.stat().st_size, "sha256": sha256(path)}
             for path in files

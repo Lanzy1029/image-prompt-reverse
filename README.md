@@ -1,33 +1,34 @@
 # Image Prompt Reverse
 
-`image-prompt-reverse` v1.2.2 is a reusable Codex Skill that turns a reference image into an auditable GPT Image reconstruction bundle.
+`image-prompt-reverse` v1.2.4 is a reusable Codex Skill that turns a reference image into an auditable GPT Image reconstruction bundle.
 
 Given an attached image, the Skill:
 
 1. inspects the reference and measures its dimensions, aspect ratio, tonal profile, and representative colors;
 2. creates both a five-color palette and a deterministic blurred map of spatial color and luminance placement;
 3. writes a step-by-step reverse-engineering report;
-4. extracts one executable English GPT Image prompt from the report;
-5. calls the built-in GPT image-generation tool using the prompt plus the blurred map, never the original image;
-6. compares the generated image with the reference; and
-7. returns the original, palette, color map, report, prompt, generated image, and verification manifest together.
+4. records concrete portrait-appearance anchors so a visible person is not reduced to a vague demographic label or generic face template;
+5. extracts one executable English GPT Image prompt from the report;
+6. calls the built-in GPT image-generation tool using the prompt plus the five-color palette and blurred map, never the original image;
+7. compares the generated image with the reference; and
+8. returns the original, palette, color map, report, prompt, generated image, and verification manifest together.
 
 ## Example: Sunlit Camera Portrait
 
-The reconstruction below was generated from the extracted text prompt plus a detail-suppressed color-distribution map. GPT Image did not receive the original image; the map carries only coarse color and luminance placement.
+The reconstruction below was generated from the extracted text prompt plus the five-color palette and a detail-suppressed color-distribution map. GPT Image did not receive the original image; the palette carries dominant hue anchors while the map carries only coarse color and luminance placement.
 
 <table>
   <tr>
     <th width="50%">Input reference</th>
-    <th width="50%">Prompt + blurred-color-map reconstruction</th>
+    <th width="50%">Prompt + palette + blurred-color-map reconstruction</th>
   </tr>
   <tr>
     <td width="50%"><img src="./examples/sunlit-camera-portrait/original-image.png" alt="Input reference: sunlit portrait of a woman holding a compact camera" width="100%"></td>
-    <td width="50%"><img src="./examples/sunlit-camera-portrait/generated-image.png" alt="GPT Image reconstruction guided by the prompt and blurred color map" width="100%"></td>
+    <td width="50%"><img src="./examples/sunlit-camera-portrait/generated-image.png" alt="GPT Image reconstruction guided by the prompt, palette, and blurred color map" width="100%"></td>
   </tr>
 </table>
 
-The reconstruction preserves the direct gaze, compact-camera pose, black bob and bangs, gingham-trimmed ivory outfit, backlit street setting, and muted cream-and-teal palette. The blurred map helps retain the pale upper field, cool left side, dark middle-right mass, and warm lower center. Its clearest deviation remains a cleaner exposure with less of the original's broad cyan-white veiling flare.
+The reconstruction preserves the East Asian-presenting appearance through concrete eye, brow, nose, cheek, chin, complexion, and hair anchors rather than a demographic label alone. The attached palette keeps the measured cream, blue-gray, slate-teal, beige, and pale blue-gray family stable without leaking swatches or labels, while the blurred map preserves their large-scale placement. Its clearest deviation remains a cleaner exposure with less of the original's broad cyan-white veiling flare.
 
 ![Measured five-color palette](./examples/sunlit-camera-portrait/color-palette.png)
 
@@ -92,7 +93,7 @@ bundle-manifest.json
 - Python 3.10 or newer.
 - At least one supported image decoder: Pillow, FFmpeg, or ImageMagick.
 
-No OpenAI API key is required for the default built-in generation path. The reconstruction stage sends the extracted text prompt and the detail-suppressed color-distribution map to the image-generation tool. It never attaches the original image.
+No OpenAI API key is required for the default built-in generation path. The reconstruction stage sends the extracted text prompt, five-color palette, and detail-suppressed color-distribution map to the image-generation tool. It never attaches the original image.
 
 ## Repository layout
 

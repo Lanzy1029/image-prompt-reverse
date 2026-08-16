@@ -1,8 +1,21 @@
 {
   "bundle_schema_version": "1.2",
   "status": "pass",
-  "verified_at": "2026-08-16T06:40:35.402767+00:00",
+  "verified_at": "2026-08-16T09:39:54.707852+00:00",
   "prompt_matches_report": true,
+  "portrait_appearance_check": {
+    "required": true,
+    "status": "pass",
+    "anchor_groups": 8
+  },
+  "generation_reference_contract": {
+    "status": "pass",
+    "image_references": [
+      "color-distribution-map.png",
+      "color-palette.png"
+    ],
+    "original_image_allowed": false
+  },
   "files": {
     "original-image.png": {
       "bytes": 9106850,
@@ -21,16 +34,16 @@
       "sha256": "3125301ddd314bafe6f6c42c936ac9d6e16e321d7474c8f59eaf7f259bd6e81f"
     },
     "reverse-engineering.md": {
-      "bytes": 16227,
-      "sha256": "118eaf033aff9ef939bf43a96f42ab752dd48548363ce76fc6db8ca4f8ada150"
+      "bytes": 18368,
+      "sha256": "31abc4289d887ca8b67b71f56a2c101844ae254f1da2fd3e0847df8292ced620"
     },
     "gpt-image-prompt.txt": {
-      "bytes": 4581,
-      "sha256": "c1db9bf191e158b2958d144fa7e9e049da428d9ed0be0283faeb72aa2371e643"
+      "bytes": 5674,
+      "sha256": "3274c991bb6c0d6b1334aff165da72d37da1c2c72c9b2006c9fc2ba143ec56cf"
     },
     "generated-image.png": {
-      "bytes": 1908480,
-      "sha256": "b66479c1e890fda2f3c4955791491163964e3d363e6da137f142869ac4828cc9"
+      "bytes": 2105689,
+      "sha256": "44c960e981f4a46995c2ee25dc77cc0fc1815cd19baacccdedea27ee9532321b"
     }
   }
 }
