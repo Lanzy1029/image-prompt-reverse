@@ -7,7 +7,7 @@ description: Analyze one or more user-provided reference images, reverse-enginee
 
 Turn a supplied image into an auditable reconstruction bundle. Complete the whole workflow without stopping after analysis or asking the user to copy a prompt manually.
 
-Version 1.2 adds a deterministic blurred color-distribution map. Use it as the only image reference during generation so GPT Image can follow the reference's large-scale color and luminance placement without receiving the original pixels or identifiable detail.
+Version 1.2.1 uses `./prompt-output/` as the default result root. Continue to use the deterministic blurred color-distribution map as the only image reference during generation so GPT Image can follow the reference's large-scale color and luminance placement without receiving the original pixels or identifiable detail.
 
 ## Required references
 
@@ -28,10 +28,10 @@ Read both files before analyzing an image:
 
 ## Output contract
 
-Create a unique directory under `./promptgen-output/` named with a timestamp and short source slug. Never overwrite a previous result. The completed directory must contain:
+Create a unique directory under `./prompt-output/` named with a timestamp and short source slug. Never overwrite a previous result. The completed directory must contain:
 
 ```text
-promptgen-output/<timestamp>-<slug>/
+prompt-output/<timestamp>-<slug>/
 ├── original-image.<ext>
 ├── color-palette.png
 ├── color-distribution-map.png
