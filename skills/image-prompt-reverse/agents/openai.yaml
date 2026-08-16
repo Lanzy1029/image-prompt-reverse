@@ -1,4 +1,4 @@
 interface:
   display_name: "Image Prompt Reverse"
   short_description: "Reverse images with spatial color guidance"
-  default_prompt: "Use $image-prompt-reverse to analyze this reference, create its palette and blurred color map, extract the GPT Image prompt, and generate a comparison image."
+  default_prompt: "Use $image-prompt-reverse to analyze this reference, generate a comparison image, and save the verified bundle to my Downloads folder."

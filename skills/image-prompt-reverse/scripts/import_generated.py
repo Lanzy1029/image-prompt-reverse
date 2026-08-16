@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy a built-in image-generation result into a PromptGen result directory."""
+"""Copy a built-in image-generation result into an Image Prompt Reverse result directory."""
 
 from __future__ import annotations
 
