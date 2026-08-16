@@ -8,6 +8,9 @@
 ### Color Palette
 ![Color palette](./color-palette.png)
 
+### Blurred Color Distribution Map
+![Blurred color distribution map](./color-distribution-map.png)
+
 ## Step 0 - Objective Measurements
 
 - File: `original-image.png`
@@ -15,6 +18,7 @@
 - Exact aspect ratio: 3:4
 - Orientation: portrait
 - Dominant colors and estimated area ratios: Cream `#DCDBD5` 31.2%; muted blue-gray `#7B9799` 21.5%; deep slate-teal `#527172` 16.8%; warm beige `#CFBDA8` 15.8%; pale blue-gray `#AEBEBE` 14.7%.
+- Blurred color distribution: a pale cream-to-blue-gray field fills the upper third; cool blue-gray occupies the left middle; the deepest slate-teal mass sits across the middle-right and returns at both lower corners; a broad warm cream and beige oval rises through the lower center.
 - Temperature / contrast / saturation: balanced temperature, medium measured contrast, muted saturation. Visually, a cool cyan veil covers the scene while direct sunlight adds warm ivory and peach highlights.
 
 ## Step 1 - Image Purpose and Visual Thesis
@@ -39,7 +43,7 @@ Strong late-morning or afternoon sunlight arrives from behind and above the subj
 
 ## Step 5 - Color System
 
-Measured cream `#DCDBD5` is the high-key base for the blouse, buildings, cars, and luminous haze. Blue-gray `#7B9799` and slate-teal `#527172` organize the road, shadowed hair, car windows, and cool flare. Warm beige `#CFBDA8` supports the sunlit skin and gold-rimmed hair, while pale blue-gray `#AEBEBE` bridges the bright architecture and atmospheric wash. Saturation is deliberately reduced. The central tension is cool cyan haze against warm peach-gold sunlight, with dark hair and gingham providing the only firm graphic anchors.
+Measured cream `#DCDBD5` is the high-key base for the blouse, buildings, cars, and luminous haze. Blue-gray `#7B9799` and slate-teal `#527172` organize the road, shadowed hair, car windows, and cool flare. Warm beige `#CFBDA8` supports the sunlit skin and gold-rimmed hair, while pale blue-gray `#AEBEBE` bridges the bright architecture and atmospheric wash. Saturation is deliberately reduced. The blurred map shows the brightest neutral field across the top, a cool left-middle zone, a dark slate concentration at middle-right, and a large warm cream mass in the lower center, with cooler teal returning around the bottom edges. The central tension is cool cyan haze against warm peach-gold sunlight, with dark hair and gingham providing the only firm graphic anchors.
 
 ## Step 6 - Style, Medium, and Surface Texture
 
@@ -73,6 +77,7 @@ Energy state: mostly static and contemplative, with gentle motion supplied by th
 | Blunt black bob, full bangs, and lifted flyaways | Use straight shoulder-length black hair with full blunt bangs and wind-blown strands extending to camera-left | visible | high |
 | Ivory blouse with oversized gingham collar and tie | Preserve the creamy short-sleeved blouse, gold buttons, and black-and-white micro-gingham sailor collar and long front tie | visible | high |
 | Measured cream, blue-gray, slate, beige, and pale gray palette | Anchor the reconstruction to `#DCDBD5`, `#7B9799`, `#527172`, `#CFBDA8`, and `#AEBEBE` in their observed visual roles | measured | high |
+| Blurred map places pale neutrals high, cool blue-gray left, dark slate right, and warm cream low-center | Preserve those four large spatial color fields without copying any blurred subject or object detail | measured | high |
 | Strong backlight and cyan veiling flare | Add warm rim light from upper-left behind the subject plus translucent cyan-white lens haze crossing the center; keep facial shadows softly filled | visible | high |
 | Strong separation between subject and simplified city blocks | Use a normal-to-short-telephoto portrait look with shallow depth of field and heavily blurred cars and apartments | inferred | medium |
 
@@ -89,6 +94,8 @@ Style/medium: Soft photorealistic natural-light portrait photography with the fe
 Composition/framing: Exact 3:4 portrait orientation, medium close-up from about the waist or lower chest upward, eye-level viewpoint. Place the subject low and slightly right of center; keep her face in the central-right area and the compact camera near the lower center. Preserve an unusually generous field of bright soft-focus negative space across the upper-left and top third. Let the lower torso crop at the bottom edge. Use shallow depth of field with sharpest attention on the eyes, bangs, hands, gingham, and camera, while architecture and vehicles melt into blur.
 Lighting/mood: Strong sunlight from behind and above on camera-left creates a warm golden-white rim on the top and left edges of the hair and illuminates individual flyaway strands. Use soft frontal ambient fill so the eyes and face remain readable with faint shadows. Wash the frame with broad translucent cyan-white veiling flare drifting diagonally from the upper-left through the center, with near-clipped ivory highlights, low overall contrast, and a tender, luminous, nostalgic atmosphere.
 Color palette: Use cream #DCDBD5 as the dominant high-key tone for clothing, buildings, cars, and haze; muted blue-gray #7B9799 for road and atmospheric accents; deep slate-teal #527172 for hair shadows, windows, and darker street shapes; warm beige #CFBDA8 for sunlit skin and gold hair edges; pale blue-gray #AEBEBE for the cool luminous veil and architecture. Keep saturation muted and balance cool cyan shadows against warm peach-gold highlights.
+Color distribution: Keep the upper third predominantly pale cream fading toward blue-gray, place a cool blue-gray field through the left middle, concentrate the deepest slate-teal mass around the middle-right, and let a broad warm cream and beige field rise through the lower center while cooler teal returns near both lower corners.
+Color-map reference: Use the attached blurred map only for coarse color and luminance placement; render the described scene with full natural detail and do not reproduce the map's blur.
 Materials/textures: Matte creamy blouse fabric, crisp micro-gingham weave, softly reflective brushed silver camera casing, translucent plastic beads, natural smooth skin with gentle diffusion, and fine individually rim-lit hair strands; keep background surfaces smooth and indistinct.
 Constraints: Keep the subject clearly adult; preserve the direct gaze, two-handed camera pose, wind-swept hair, large upper-left negative space, warm back rim, cool cyan flare, high-key exposure, and soft urban depth layers. Show anatomically natural hands with five fingers each and one compact camera only. Keep all objects generic and unbranded.
 Avoid: readable logos or text, extra people, extra cameras, duplicated fingers, harsh shadows, saturated colors, crunchy HDR detail, a dark dramatic background, heavy makeup, or crisp background architecture.
@@ -99,7 +106,7 @@ Avoid: readable logos or text, extra people, extra cameras, duplicated fingers, 
 
 - Subject and action covered: yes
 - Composition and exact aspect ratio covered: yes
-- Lighting and measured palette covered: yes
+- Lighting, measured palette, and spatial color distribution covered: yes
 - Materials and style covered: yes
 - Visible text quoted verbatim or explicitly absent: yes
 - No empty quality terms, artist names, or unsupported details: yes
@@ -111,19 +118,19 @@ Avoid: readable logos or text, extra people, extra cameras, duplicated fingers, 
 
 ### Comparison Conclusion
 
-The prompt-only reconstruction preserves the central concept and most identifying visual cues: a directly gazing adult woman with a blunt black bob holds a silver compact camera, wears an ivory gingham-trimmed outfit, and stands in a backlit residential street with a white car left and dark car right. Its warm hair rim, cool blue-gray city palette, wind-blown strands, beaded camera charm, and upper-left negative space correspond closely to the reference. The generated result is nevertheless cleaner, sharper, and more conventionally exposed; it shows more of the torso, gives the street and buildings greater legibility, and lacks the reference's strong cyan-white veil across the face and central frame. The original therefore feels more overexposed, flatter, softer, and more dreamlike.
+The v1.2 reconstruction uses the extracted text prompt plus the detail-suppressed color-distribution map, never the original image. It preserves the central concept and decisive visual cues: a directly gazing adult woman with a blunt black bob holds a silver compact camera, wears an ivory gingham-trimmed outfit, and stands in a backlit residential street with a white car left and dark car right. The largest spatial color fields also correspond well: pale neutrals fill the top, cool blue-gray occupies the left, a dark teal mass anchors the middle-right, and warm cream rises through the lower center. The result remains cleaner and more conventionally exposed than the reference, with more legible architecture and less cyan-white veil crossing the face.
 
 ### Three Strongest Matches
 
 1. Subject fidelity is high: direct calm gaze, black bob and bangs, wind-swept hair, two-handed silver compact-camera pose, and dangling translucent bead charm are all retained.
 2. Wardrobe and palette are close: creamy ivory fabric, black-and-white micro-gingham sailor collar and tie, gold buttons, muted teal shadows, warm skin, and pale architecture reproduce the main color system.
-3. The lighting narrative is correct: bright upper-left backlight, golden rim on the hair, blurred parked vehicles, and a luminous residential street establish the same nostalgic outdoor moment.
+3. The blurred map's large-scale placement carries through: bright upper-left and top fields, cool roadway on the left, dark vehicle and shadow mass on the right, and the warm light garment in the lower center.
 
 ### Three Clearest Deviations
 
-1. The generated flare is localized mainly at the upper-left and appears as clean sun rays; the reference has a broader cyan-white veiling glare that crosses the hair, eyes, face, camera, and lower center, suppressing contrast across most of the image.
-2. The generated framing is looser and more fashion-editorial, showing nearly the full torso and more road, while the reference pushes the head, face, hands, and camera closer to the viewer and crops the torso earlier.
-3. Background buildings and vehicles are more recognizable and contrasty in the generation; the reference reduces them to softer, larger, washed-out blocks with more clipped whites and less spatial detail.
+1. The generated flare remains concentrated at the upper-left and behind the hair; the reference carries a broader cyan-white veil across the face, camera, and central frame, suppressing contrast more aggressively.
+2. The generated framing is looser, showing more torso and road, while the reference pushes the face, hands, and camera closer to the viewer and lets them dominate more of the lower half.
+3. Background buildings and vehicles are more recognizable and geometrically defined in the generation; the reference reduces them to softer, larger, more washed-out blocks.
 
 ### Next-Pass Recommendation
 

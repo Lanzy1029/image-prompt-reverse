@@ -11,6 +11,8 @@ from pathlib import Path
 
 from extract_prompt import extract_prompt
 
+BUNDLE_SCHEMA_VERSION = "1.2"
+
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -52,26 +54,37 @@ def main() -> int:
     original = one_match(folder, "original-image.*", "original image")
     generated = one_match(folder, "generated-image.*", "generated image")
     palette = folder / "color-palette.png"
+    distribution = folder / "color-distribution-map.png"
     analysis = folder / "image-analysis.json"
     report = folder / "reverse-engineering.md"
     prompt_file = folder / "gpt-image-prompt.txt"
-    for path in (palette, analysis, report, prompt_file):
+    for path in (palette, distribution, analysis, report, prompt_file):
         if not path.is_file() or path.stat().st_size == 0:
             raise FileNotFoundError(f"required artifact missing or empty: {path.name}")
-    for path in (original, generated, palette):
+    for path in (original, generated, palette, distribution):
         check_image(path)
+
+    analysis_data = json.loads(analysis.read_text(encoding="utf-8"))
+    if analysis_data.get("analysis_schema_version") != BUNDLE_SCHEMA_VERSION:
+        raise ValueError(f"image-analysis.json is not schema version {BUNDLE_SCHEMA_VERSION}")
+    if analysis_data.get("color_distribution_file") != distribution.name:
+        raise ValueError("image-analysis.json does not identify color-distribution-map.png")
+    distribution_data = analysis_data.get("color_distribution")
+    if not isinstance(distribution_data, dict) or not distribution_data.get("pixel_dimensions"):
+        raise ValueError("image-analysis.json lacks color distribution metadata")
 
     report_text = report.read_text(encoding="utf-8")
     marked_prompt = extract_prompt(report_text)
     saved_prompt = prompt_file.read_text(encoding="utf-8").strip()
     if marked_prompt != saved_prompt:
         raise ValueError("gpt-image-prompt.txt does not exactly match the marked report prompt")
-    for name in (original.name, palette.name, generated.name):
+    for name in (original.name, palette.name, distribution.name, generated.name):
         if f"./{name}" not in report_text:
             raise ValueError(f"report does not link to {name}")
 
-    files = [original, palette, analysis, report, prompt_file, generated]
+    files = [original, palette, distribution, analysis, report, prompt_file, generated]
     manifest = {
+        "bundle_schema_version": BUNDLE_SCHEMA_VERSION,
         "status": "pass",
         "verified_at": datetime.now(timezone.utc).isoformat(),
         "prompt_matches_report": True,
