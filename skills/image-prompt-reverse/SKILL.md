@@ -1,11 +1,13 @@
 ---
 name: image-prompt-reverse
-description: Analyze one or more user-provided reference images, reverse-engineer their visual construction into a step-by-step English report and an executable English GPT Image prompt, create a deterministic color-palette PNG, automatically extract the prompt from the report, call GPT Image to generate a prompt-only reconstruction, compare the result with the reference, and deliver the original image, palette, report, extracted prompt, generated image, and verification manifest together. Use when the user asks to reverse-engineer an image prompt, recreate an image with GPT Image, infer a prompt from a picture, extract a palette from a reference, or compare an original image with a prompt-only reconstruction.
+description: Analyze one or more user-provided reference images, reverse-engineer their visual construction into a step-by-step English report and an executable English GPT Image prompt, create a deterministic color palette and detail-suppressed spatial color-distribution map, automatically extract the prompt, use the blurred map rather than the original image to condition GPT Image generation, compare the result, and deliver a verified reconstruction bundle. Use when the user asks to reverse-engineer an image prompt, recreate an image with GPT Image, infer a prompt from a picture, extract a palette or spatial color layout from a reference, or compare an original image with a reconstructed result.
 ---
 
 # Image Prompt Reverse
 
 Turn a supplied image into an auditable reconstruction bundle. Complete the whole workflow without stopping after analysis or asking the user to copy a prompt manually.
+
+Version 1.2 adds a deterministic blurred color-distribution map. Use it as the only image reference during generation so GPT Image can follow the reference's large-scale color and luminance placement without receiving the original pixels or identifiable detail.
 
 ## Required references
 
@@ -21,6 +23,7 @@ Read both files before analyzing an image:
 - Reconstruct the visible subject and scene by default so the generated result can test the prompt. Switch to transferable-style mode only when the user asks to replace the subject or setting.
 - Write every textual artifact in English unless the user explicitly requests another language for the task output.
 - Preserve the reference aspect ratio in the analysis and prompt.
+- Preserve large-scale spatial color placement through the blurred distribution map while suppressing semantic detail.
 - Use the built-in image-generation tool. Do not ask for an API key and do not use a browser UI or third-party service.
 
 ## Output contract
@@ -31,6 +34,7 @@ Create a unique directory under `./promptgen-output/` named with a timestamp and
 promptgen-output/<timestamp>-<slug>/
 ├── original-image.<ext>
 ├── color-palette.png
+├── color-distribution-map.png
 ├── image-analysis.json
 ├── reverse-engineering.md
 ├── gpt-image-prompt.txt
@@ -56,11 +60,13 @@ Create a unique result directory, then run:
 python3 <skill-dir>/scripts/analyze_reference.py <input-image> <result-dir>
 ```
 
-The script preserves the source bytes as `original-image.<ext>`, extracts five representative colors, renders `color-palette.png`, and writes dimensions, exact reduced aspect ratio, palette ratios, tonal profile, and hashes to `image-analysis.json`.
+The script preserves the source bytes as `original-image.<ext>`, extracts five representative colors, renders `color-palette.png`, creates `color-distribution-map.png`, and writes dimensions, exact reduced aspect ratio, palette ratios, spatial-map metadata, tonal profile, and hashes to `image-analysis.json`.
+
+The color-distribution map must be deterministic and strongly detail-suppressed. Retain only coarse color fields, luminance zones, and their approximate locations. Treat it as evidence for color placement, not evidence for subject identity or object detail.
 
 If the decoder is unavailable, report the script's actionable dependency message. Do not invent palette hex values and call them measured.
 
-Inspect `color-palette.png` after creation and read `image-analysis.json` completely.
+Inspect both `color-palette.png` and `color-distribution-map.png` after creation, then read `image-analysis.json` completely. If recognizable facial, textual, or object detail remains in the distribution map, treat the output as invalid and increase detail suppression before generation.
 
 ### 3. Reverse-engineer step by step
 
@@ -74,7 +80,7 @@ Do not identify a real person from the image. Describe visible appearance. Do no
 
 ### 4. Write the report and embed the prompt
 
-Write `reverse-engineering.md` using the exact section order and prompt markers in `references/reverse-analysis-contract.md`. Add relative image links to the original and palette.
+Write `reverse-engineering.md` using the exact section order and prompt markers in `references/reverse-analysis-contract.md`. Add relative image links to the original, palette, and color-distribution map. Use the map to describe where major warm, cool, light, dark, neutral, and accent fields sit in the frame.
 
 Build the English GPT Image prompt using `references/gpt-image-prompt-contract.md`. Put exactly one executable prompt between these markers:
 
@@ -100,12 +106,14 @@ python3 <skill-dir>/scripts/extract_prompt.py \
 
 Read `gpt-image-prompt.txt` back and use its contents verbatim for generation. This step is mandatory: do not retype or silently improve the prompt after extraction.
 
-### 6. Generate from the prompt only
+### 6. Generate from the prompt and blurred color map
 
-Call the built-in `image_gen.imagegen` GPT image-generation tool with the extracted prompt as a brand-new generation.
+Call the built-in `image_gen.imagegen` GPT image-generation tool with the extracted prompt and `color-distribution-map.png` as a reference-conditioned generation.
 
-- Omit `referenced_image_paths` and `num_last_images_to_include` so the reconstruction tests the extracted text instead of directly copying the reference pixels.
-- Do not turn this into an edit request.
+- Set `referenced_image_paths` to a one-item list containing only the absolute local path to `color-distribution-map.png`.
+- Omit `num_last_images_to_include`.
+- Never attach `original-image.<ext>` to the generation call.
+- Tell the generator through the extracted prompt to use the attached blurred map only for large-scale color and luminance placement, not as a source of subjects, objects, texture, or blur.
 - Generate one image by default.
 - If the built-in tool is unavailable, stop and explain that the automatic generation stage could not run. Do not silently switch to an API/CLI path.
 
@@ -123,6 +131,7 @@ Inspect the saved generated image. Append to `reverse-engineering.md`:
 
 - a relative link to the generated image;
 - a concise comparison covering composition, lighting, color, materials, and subject fidelity;
+- whether the major spatial color fields match the blurred distribution map;
 - the three strongest matches;
 - the three clearest deviations;
 - one suggested next-pass change, without changing the extracted prompt or regenerating unless the user asked for iteration.
@@ -137,24 +146,25 @@ Run:
 python3 <skill-dir>/scripts/verify_bundle.py <result-dir>
 ```
 
-Fix every reported failure. The verifier confirms required artifacts, image signatures, report links, and exact equality between the marked report prompt and `gpt-image-prompt.txt`, then writes `bundle-manifest.json`.
+Fix every reported failure. The verifier confirms required artifacts, image signatures, distribution-map metadata, report links, and exact equality between the marked report prompt and `gpt-image-prompt.txt`, then writes `bundle-manifest.json`.
 
 ### 9. Present the result
 
 In the final response:
 
-- show the original image, color palette, and generated image inline using absolute paths;
+- show the original image, color palette, blurred color-distribution map, and generated image inline using absolute paths;
 - link the report, extracted prompt, manifest, and result directory;
 - state that the built-in GPT image-generation tool was used;
 - summarize the strongest match and largest deviation in one or two sentences.
 
-Do not finish with only file paths or only the generated image. All seven artifacts are part of the result.
+Do not finish with only file paths or only the generated image. All eight artifacts are part of the result.
 
 ## Failure boundaries
 
 - Missing image: request a new attachment.
 - Unsupported/corrupt image: preserve no partial claim; report the decoder error.
 - Palette failure: do not replace measured colors with guessed colors.
+- Distribution-map failure: do not pass the original image as a substitute reference; retain the analysis artifacts and report the bundle incomplete.
 - Prompt extraction failure: repair the report markers and extract again before generation.
 - Generation failure: retain the completed analysis artifacts, clearly mark the bundle incomplete, and do not create a fake generated file or passing manifest.
 - Ambiguous visible detail: write `unclear` and give at most one plausible alternative.

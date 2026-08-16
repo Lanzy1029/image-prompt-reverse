@@ -18,6 +18,8 @@ Style/medium: <photo, illustration, 3D, collage, print, or hybrid method>
 Composition/framing: <exact reduced aspect ratio, orientation, shot size, viewpoint, placement, negative space>
 Lighting/mood: <direction, softness, contrast, color temperature, atmosphere>
 Color palette: <three to five measured hex colors with their visual roles>
+Color distribution: <large-scale placement of light, dark, warm, cool, neutral, and accent fields from the blurred map>
+Color-map reference: Use the attached blurred map only for coarse color and luminance placement; render the described scene with full natural detail and do not reproduce the map's blur.
 Materials/textures: <specific surface and image texture>
 Text (verbatim): "<exact visible text>"
 Constraints: <must-preserve requirements stated positively>
@@ -29,6 +31,8 @@ Avoid: <only the few likely failure modes>
 - Put subject and action in `Primary request`; do not bury them in later lines.
 - Use the exact aspect ratio reported by the analyzer, not a guessed common ratio.
 - Use measured colors as anchors while describing their roles, not as a disconnected hex list.
+- Translate the blurred color-distribution map into explicit spatial instructions such as `warm highlight in the upper left`, `dark field across the lower third`, or `cool neutral background on the right`.
+- State that the attached blurred map controls only coarse color and luminance placement. Do not ask the generator to reproduce its blur, invent subjects from it, or treat it as the original image.
 - Describe real texture concretely: skin pores, worn fabric, matte ceramic, halftone dots, paper fibers, brush edges, film grain, or settled dust only when visible.
 - Treat inferred focal length and aperture as visual equivalents, not camera metadata facts.
 - Put any required rendered text in quotation marks, with placement and typography guidance. Omit the `Text` line if no text is visible.

@@ -23,6 +23,7 @@ Produce an evidence-led English reconstruction report that shows how the final p
 8. Describe a real person through visible traits, pose, expression, wardrobe, and lighting rather than naming them.
 9. Do not name a living artist. Describe movements, media, brushwork, geometry, texture, and palette instead.
 10. Preserve the exact reduced aspect ratio from `image-analysis.json`.
+11. Use `color-distribution-map.png` only to measure large-scale spatial color and luminance placement; never infer identity, text, objects, or fine composition from the blurred map.
 
 ## Required report structure
 
@@ -38,6 +39,9 @@ Use these headings in exactly this order. Add detail inside a section rather tha
 
 ### Color Palette
 ![Color palette](./color-palette.png)
+
+### Blurred Color Distribution Map
+![Blurred color distribution map](./color-distribution-map.png)
 
 ## Step 0 - Objective Measurements
 
@@ -66,7 +70,7 @@ Describe key-light direction, softness, temperature, fill, rim light, contrast, 
 
 ## Step 5 - Color System
 
-Reference the measured palette and explain color roles, warm/cool relationships, saturation strategy, tonal range, and focal emphasis.
+Reference the measured palette and blurred color-distribution map. Explain color roles, warm/cool relationships, saturation strategy, tonal range, focal emphasis, and where the largest color and luminance fields sit in the frame.
 
 ## Step 6 - Style, Medium, and Surface Texture
 
@@ -104,7 +108,7 @@ List five to eight of the most important image-evidence-to-prompt-instruction tr
 
 - Subject and action covered: yes / no
 - Composition and exact aspect ratio covered: yes / no
-- Lighting and measured palette covered: yes / no
+- Lighting, measured palette, and spatial color distribution covered: yes / no
 - Materials and style covered: yes / no
 - Visible text quoted verbatim or explicitly absent: yes / no
 - No empty quality terms, artist names, or unsupported details: yes / no
@@ -122,7 +126,7 @@ After generation, append this material to the same file:
 
 ### Comparison Conclusion
 
-Compare composition, lighting, color, materials, and subject fidelity in one concise paragraph.
+Compare composition, lighting, color, materials, subject fidelity, and large-scale spatial color placement in one concise paragraph.
 
 ### Three Strongest Matches
 

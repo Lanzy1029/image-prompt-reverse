@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Preserve a reference image and create deterministic palette evidence without Python packages."""
+"""Preserve a reference image and create deterministic color evidence."""
 
 from __future__ import annotations
 
@@ -16,6 +16,10 @@ from pathlib import Path
 
 MAX_EDGE = 256
 TARGET_COLORS = 5
+ANALYSIS_SCHEMA_VERSION = "1.2"
+DISTRIBUTION_GRID_LONG_EDGE = 24
+DISTRIBUTION_OUTPUT_LONG_EDGE = 1024
+DISTRIBUTION_BLUR_PASSES = 2
 
 FONT = {
     "0": ["01110", "10001", "10011", "10101", "11001", "10001", "01110"],
@@ -429,6 +433,133 @@ def write_palette_png(path: Path, colors: list[dict[str, object]]) -> None:
     path.write_bytes(png)
 
 
+def downsample_spatial_grid(
+    pixels: list[tuple[int, int, int]],
+    width: int,
+    height: int,
+    target_width: int,
+    target_height: int,
+) -> list[tuple[int, int, int]]:
+    """Average rectangular source regions into a coarse spatial color grid."""
+    result = []
+    for target_y in range(target_height):
+        source_y0 = target_y * height // target_height
+        source_y1 = max(source_y0 + 1, (target_y + 1) * height // target_height)
+        for target_x in range(target_width):
+            source_x0 = target_x * width // target_width
+            source_x1 = max(source_x0 + 1, (target_x + 1) * width // target_width)
+            red = green = blue = count = 0
+            for source_y in range(source_y0, min(source_y1, height)):
+                row = source_y * width
+                for source_x in range(source_x0, min(source_x1, width)):
+                    pixel = pixels[row + source_x]
+                    red += pixel[0]
+                    green += pixel[1]
+                    blue += pixel[2]
+                    count += 1
+            result.append((round(red / count), round(green / count), round(blue / count)))
+    return result
+
+
+def box_blur_grid(
+    pixels: list[tuple[int, int, int]],
+    width: int,
+    height: int,
+    passes: int = DISTRIBUTION_BLUR_PASSES,
+) -> list[tuple[int, int, int]]:
+    """Blur a small RGB grid while retaining large-scale color placement."""
+    current = pixels
+    for _ in range(passes):
+        blurred = []
+        for y in range(height):
+            for x in range(width):
+                red = green = blue = count = 0
+                for neighbor_y in range(max(0, y - 1), min(height, y + 2)):
+                    row = neighbor_y * width
+                    for neighbor_x in range(max(0, x - 1), min(width, x + 2)):
+                        pixel = current[row + neighbor_x]
+                        red += pixel[0]
+                        green += pixel[1]
+                        blue += pixel[2]
+                        count += 1
+                blurred.append((round(red / count), round(green / count), round(blue / count)))
+        current = blurred
+    return current
+
+
+def bilinear_upscale(
+    pixels: list[tuple[int, int, int]],
+    width: int,
+    height: int,
+    target_width: int,
+    target_height: int,
+) -> bytearray:
+    """Render a coarse color grid as a smooth RGB raster."""
+    x_samples = []
+    for target_x in range(target_width):
+        source_x = (target_x + 0.5) * width / target_width - 0.5
+        x0 = max(0, min(width - 1, math.floor(source_x)))
+        x1 = max(0, min(width - 1, x0 + 1))
+        x_samples.append((x0, x1, max(0.0, min(1.0, source_x - x0))))
+
+    canvas = bytearray(target_width * target_height * 3)
+    for target_y in range(target_height):
+        source_y = (target_y + 0.5) * height / target_height - 0.5
+        y0 = max(0, min(height - 1, math.floor(source_y)))
+        y1 = max(0, min(height - 1, y0 + 1))
+        y_weight = max(0.0, min(1.0, source_y - y0))
+        for target_x, (x0, x1, x_weight) in enumerate(x_samples):
+            top_left = pixels[y0 * width + x0]
+            top_right = pixels[y0 * width + x1]
+            bottom_left = pixels[y1 * width + x0]
+            bottom_right = pixels[y1 * width + x1]
+            offset = (target_y * target_width + target_x) * 3
+            for channel in range(3):
+                top = top_left[channel] * (1 - x_weight) + top_right[channel] * x_weight
+                bottom = bottom_left[channel] * (1 - x_weight) + bottom_right[channel] * x_weight
+                canvas[offset + channel] = round(top * (1 - y_weight) + bottom * y_weight)
+    return canvas
+
+
+def write_rgb_png(path: Path, width: int, height: int, pixels: bytes | bytearray) -> None:
+    raw = b"".join(b"\x00" + bytes(pixels[row * width * 3:(row + 1) * width * 3]) for row in range(height))
+    png = (
+        b"\x89PNG\r\n\x1a\n"
+        + png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+        + png_chunk(b"IDAT", zlib.compress(raw, 9))
+        + png_chunk(b"IEND", b"")
+    )
+    path.write_bytes(png)
+
+
+def write_color_distribution_png(
+    path: Path,
+    original_width: int,
+    original_height: int,
+    sample_width: int,
+    sample_height: int,
+    sample_pixels: list[tuple[int, int, int]],
+) -> dict[str, object]:
+    """Create a detail-suppressed map of large-scale color and luminance placement."""
+    grid_scale = DISTRIBUTION_GRID_LONG_EDGE / max(sample_width, sample_height)
+    grid_width = max(4, round(sample_width * grid_scale))
+    grid_height = max(4, round(sample_height * grid_scale))
+    coarse = downsample_spatial_grid(sample_pixels, sample_width, sample_height, grid_width, grid_height)
+    coarse = box_blur_grid(coarse, grid_width, grid_height)
+
+    output_scale = DISTRIBUTION_OUTPUT_LONG_EDGE / max(original_width, original_height)
+    output_width = max(1, round(original_width * output_scale))
+    output_height = max(1, round(original_height * output_scale))
+    raster = bilinear_upscale(coarse, grid_width, grid_height, output_width, output_height)
+    write_rgb_png(path, output_width, output_height, raster)
+    return {
+        "method": "coarse spatial averaging, two-pass box blur, and bilinear reconstruction",
+        "grid_dimensions": {"width": grid_width, "height": grid_height},
+        "pixel_dimensions": {"width": output_width, "height": output_height},
+        "purpose": "Large-scale color and luminance placement reference with identifying detail intentionally suppressed.",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input_image", type=Path)
@@ -441,7 +572,12 @@ def main() -> int:
     suffix = infer_suffix(source)
     result_dir = args.result_dir.resolve()
     result_dir.mkdir(parents=True, exist_ok=True)
-    protected = [result_dir / f"original-image{suffix}", result_dir / "color-palette.png", result_dir / "image-analysis.json"]
+    protected = [
+        result_dir / f"original-image{suffix}",
+        result_dir / "color-palette.png",
+        result_dir / "color-distribution-map.png",
+        result_dir / "image-analysis.json",
+    ]
     if any(path.exists() for path in protected):
         raise FileExistsError("result directory already contains analyzer outputs; use a new unique directory")
 
@@ -453,11 +589,21 @@ def main() -> int:
     profile = tonal_profile(pixels)
     palette_path = result_dir / "color-palette.png"
     write_palette_png(palette_path, colors)
+    distribution_path = result_dir / "color-distribution-map.png"
+    distribution = write_color_distribution_png(
+        distribution_path,
+        original_width,
+        original_height,
+        sample_width,
+        sample_height,
+        pixels,
+    )
 
     divisor = math.gcd(original_width, original_height)
     ratio = f"{original_width // divisor}:{original_height // divisor}"
     orientation = "square" if original_width == original_height else "landscape" if original_width > original_height else "portrait"
     analysis = {
+        "analysis_schema_version": ANALYSIS_SCHEMA_VERSION,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "original_file": original.name,
         "source_sha256": file_sha256(original),
@@ -469,12 +615,21 @@ def main() -> int:
         "decoder": decoder,
         "palette_file": palette_path.name,
         "palette": colors,
+        "color_distribution_file": distribution_path.name,
+        "color_distribution": distribution,
         "tonal_profile": profile,
-        "measurement_note": "Palette ratios are deterministic estimates from a decoder-scaled pixel sample; semantic observations require visual inspection.",
+        "measurement_note": "Palette ratios and the blurred spatial color map are deterministic estimates from a decoder-scaled pixel sample; semantic observations require visual inspection.",
     }
     analysis_path = result_dir / "image-analysis.json"
     analysis_path.write_text(json.dumps(analysis, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"status": "ok", "result_dir": str(result_dir), "original": original.name, "aspect_ratio": ratio, "colors": colors}, ensure_ascii=False))
+    print(json.dumps({
+        "status": "ok",
+        "result_dir": str(result_dir),
+        "original": original.name,
+        "aspect_ratio": ratio,
+        "colors": colors,
+        "color_distribution": distribution_path.name,
+    }, ensure_ascii=False))
     return 0
 
 
